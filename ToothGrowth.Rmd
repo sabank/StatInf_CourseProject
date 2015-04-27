@@ -1,0 +1,84 @@
+---
+title: "ToothGrowth"
+author: "Sabank"
+date: "April 26, 2015"
+output:
+  word_document: default
+  html_document:
+    keep_md: yes
+---
+
+## Exploratory Analysis
+```{r, echo=TRUE}
+# load R libraries
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(reshape2)
+library(knitr)
+```
+
+### 1. Load data
+```{r, echo=TRUE}
+# load data
+data(ToothGrowth)
+```
+
+### 2. Statistics
+```{r, echo=TRUE}
+# summary statistics
+summary(ToothGrowth)
+
+### analysis of tooth growth by supp and dose
+x <- melt(ToothGrowth, id = c("supp", "dose"), measure.vars = "len")
+stats_x <- dcast(x, supp + dose ~ variable, mean)
+
+kable(head(stats_x), format = "html", align = "c",
+      caption = "Average teeth growth")
+
+## plot stats overview
+plot(stats_x)
+```
+
+### 2.1 Analysis of data "dose"
+```{r,echo=TRUE}
+boxplot(len ~ dose, data = stats_x, main = "Average teeth growth by dose",
+        xlab = "dose", ylab = "mean")
+
+d_05 <- filter(stats_x, dose == 0.5)
+d_1 <- filter(stats_x, dose == 1)
+d_2 <- filter(stats_x, dose == 1)
+
+d_05_conf <- (mean(d_05$len) + c(-1,1) * qnorm(.975) * sd(d_05$len)/sqrt(length(d_05$len)))
+d_1_conf <- (mean(d_1$len) + c(-1,1) * qnorm(.975) * sd(d_1$len)/sqrt(length(d_1$len)))
+d_2_conf <- (mean(d_2$len) + c(-1,1) * qnorm(.975) * sd(d_2$len)/sqrt(length(d_2$len)))
+```
+Confidence interval 95%:
+
+* dose 0.5 = `r d_05_conf`
+
+* dose 1 = `r d_1_conf`
+
+* dose 2 = `r d_2_conf`
+
+### 2.2 Analysis of data "supp"
+```{r,echo=TRUE}
+boxplot(len ~ supp, data = stats_x, main = "Average teeh growth by supp",
+        xlab = "supp", ylab = "mean")
+
+s_oj <- filter(stats_x, supp == "OJ")
+s_vc <- filter(stats_x, supp == "VC")
+
+s_oj_conf <- (mean(s_oj$len) + c(-1,1) * qnorm(.975) * sd(s_oj$len)/sqrt(length(s_oj$len)))
+s_vc_conf <- (mean(s_vc$len) + c(-1,1) * qnorm(.975) * sd(s_vc$len)/sqrt(length(s_vc$len)))
+```
+Confidence interval 95%:
+
+* supp OJ = `r s_oj_conf`
+
+* supp VC = `r s_vc_conf`
+
+
+
+
+
